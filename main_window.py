@@ -39,18 +39,32 @@ class MainWindow(Gtk.Window):
         self.situation_edit = Gtk.Entry()
         self.situation_edit.set_text("Situation")
 
+        ### Make the title
+        self.offensive_char.connect("changed", self.updated_chars)
+        self.defensive_char.connect("changed", self.updated_chars)
+        self.situation_edit.connect("key-press-event", self.updated_situation)
+
+
         ### Fill the window with widgets
         self.grid.attach(self.offensive_char_label, 0, 0, 1, 1)
         self.grid.attach(self.offensive_char, 0, 1, 1, 1)
         self.grid.attach(self.add_offensive_option_label, 0, 3, 1, 1)
         self.grid.attach(self.add_offensive_option_edit, 0, 4, 1, 1)
         self.grid.attach(self.add_offensive_option_confirm, 0, 5, 1, 1)
+        self.add_offensive_option_edit.connect("key-press-event", self.confirm_add_offensive_option)
 
         self.grid.attach(self.defensive_char_label, 2, 0, 1, 1)
         self.grid.attach(self.defensive_char, 2, 1, 1, 1)
         self.grid.attach(self.add_defensive_option_label, 2, 3, 1, 1)
         self.grid.attach(self.add_defensive_option_edit, 2, 4, 1, 1)
         self.grid.attach(self.add_defensive_option_confirm, 2, 5, 1, 1)
+        self.add_defensive_option_edit.connect("key-press-event", self.confirm_add_defensive_option)
+
+
+        self.grid.attach(self.situation_label, 1, 0, 1, 1)
+        self.grid.attach(self.situation_edit, 1, 1, 1, 1)
+        self.grid.attach(self.title_part_characters, 1, 4, 1, 1)
+        self.grid.attach(self.title_part_situation, 1, 5, 1, 1)
 
         ### Main frame setup
         self.center_grid = Gtk.Grid()
@@ -62,6 +76,32 @@ class MainWindow(Gtk.Window):
         self.current_focus = [0,0]
         self.center_grid.attach(self.table[0][0], 0,0,1,1)
         self.grid.attach(self.center_grid, 1, 6, 1, 1)
+
+    def updated_chars(self, widget):
+        try :
+            o = self.offensive_char.get_active_text() # offensive char text
+            d = self.defensive_char.get_active_text() # defensive char text
+            if (len(o) > 0 and len(d) > 0):
+                self.title_part_characters.set_text(o + " vs " + d)
+        except :
+            pass
+
+
+    def updated_situation(self, widget, ev):
+        if ev.keyval == Gdk.KEY_Left:
+            self.offensive_char.grab_focus()
+        if ev.keyval == Gdk.KEY_Right:
+            self.defensive_char.grab_focus()
+        self.title_part_situation.set_text(self.situation_edit.get_text())
+        self.table[0][0].set_text(self.situation_edit.get_text())
+
+    def confirm_add_offensive_option(self, widget, ev):
+        if ev.keyval == Gdk.KEY_Return:
+            self.add_offensive_option(widget)
+
+    def confirm_add_defensive_option(self, widget, ev):
+        if ev.keyval == Gdk.KEY_Return:
+            self.add_defensive_option(widget)
 
 
     def add_defensive_option(self, button):
