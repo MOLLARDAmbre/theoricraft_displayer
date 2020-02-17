@@ -1,6 +1,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from gi.repository import Gdk
 
 
 class ResultPopup(Gtk.Window):
@@ -29,6 +30,11 @@ class ResultPopup(Gtk.Window):
         self.cancel_button = Gtk.Button(label="Cancel")
         self.cancel_button.connect("clicked", self.cancel)
 
+        # Sets focus on the scale and adds behaviour to scale and edit
+        self.scale.grab_focus()
+        self.scale.connect("key-press-event", self.on_key_pressed)
+        self.edit.connect("key-press-event", self.on_key_pressed)
+
         # Adds the elements to the grid
         self.add(self.grid)
         self.grid.attach(self.edit, 1, 3, 1, 1)
@@ -46,6 +52,13 @@ class ResultPopup(Gtk.Window):
         self.btn.give_result(self.scale.get_value(), self.edit.get_text())
         self.close()
 
+    def on_key_pressed(self, widget, ev):
+        if ev.keyval == Gdk.KEY_Return: # When enter is pressed
+            self.save(None) # No need to add the widget argument
+            return
+        if ev.keyval == Gdk.KEY_Escape: # When esc is pressed
+            self.cancel(None) # No need to add the widget argument
+            return
 
 if (__name__ == "__main__"):
     win = ResultPopup()

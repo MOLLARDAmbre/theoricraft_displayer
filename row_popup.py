@@ -1,6 +1,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from gi.repository import Gdk
 
 class RowPopup(Gtk.Window):
     def __init__(self, btn):
@@ -22,6 +23,11 @@ class RowPopup(Gtk.Window):
         self.cancel_btn.connect("clicked", self.cancel)
         self.delete_btn.connect("clicked", self.delete)
 
+
+        # Adds focus to the entry and link it with corresponding behaviour
+        self.edit.connect("key-press-event", self.on_key_pressed)
+        self.edit.grab_focus()
+
         # Grid setup
         self.grid.set_column_homogeneous(True)
         self.grid.set_column_spacing(10)
@@ -37,6 +43,7 @@ class RowPopup(Gtk.Window):
         self.grid.attach(self.delete_btn, 2, 1, 1, 1)
 
 
+
     def save(self, widget):
         self.btn.update(self.edit.get_text())
         self.close()
@@ -47,5 +54,13 @@ class RowPopup(Gtk.Window):
     def delete(self, widget):
         self.btn.delete()
         self.close()
+
+    def on_key_pressed(self, widget, ev):
+        if ev.keyval == Gdk.KEY_Return: # When enter is pressed
+            self.save(None) # No need to add the widget argument
+            return
+        if ev.keyval == Gdk.KEY_Escape: # When esc is pressed
+            self.cancel(None) # No need to add the widget argument
+            return
 
 ### TODO : make it able to delete a row/column or edit the name

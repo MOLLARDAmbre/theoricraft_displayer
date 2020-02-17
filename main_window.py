@@ -3,6 +3,9 @@ from row_button import RowButton
 from option_button import OptionButton
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from gi.repository import Gdk
+
+
 
 class MainWindow(Gtk.Window):
     def __init__(self):
@@ -56,6 +59,7 @@ class MainWindow(Gtk.Window):
         self.center_grid.set_row_homogeneous(True)
         self.center_grid.set_row_spacing(5)
         self.table = [[Gtk.Label(self.situation_edit.get_text())]]
+        self.current_focus = [0,0]
         self.center_grid.attach(self.table[0][0], 0,0,1,1)
         self.grid.attach(self.center_grid, 1, 6, 1, 1)
 
