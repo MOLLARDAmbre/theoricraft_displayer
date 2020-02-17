@@ -44,7 +44,8 @@ class MainWindow(Gtk.Window):
         self.offensive_char.connect("changed", self.updated_chars)
         self.defensive_char.connect("changed", self.updated_chars)
         self.situation_edit.connect("key-release-event", self.updated_situation)
-        
+        self.situation_edit.connect("key-press-event", self.move_situation)
+
 
         ### Fill the window with widgets
         self.grid.attach(self.offensive_char_label, 0, 0, 1, 1)
@@ -89,12 +90,14 @@ class MainWindow(Gtk.Window):
         except :
             pass
 
-
-    def updated_situation(self, widget, ev):
+    def move_situation(self, widget, ev):
         if ev.keyval == Gdk.KEY_Left:
             self.offensive_char.grab_focus()
         if ev.keyval == Gdk.KEY_Right:
             self.defensive_char.grab_focus()
+
+
+    def updated_situation(self, widget, ev):
         self.title_part_situation.set_text(self.situation_edit.get_text())
         self.table[0][0].set_text(self.situation_edit.get_text())
 

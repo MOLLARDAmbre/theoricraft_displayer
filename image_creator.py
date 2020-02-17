@@ -6,6 +6,8 @@ import numpy as np
 
 
 def save(path, table):
+    from os import chdir
+    chdir("theoricraft_displayer")
     width = len(table[0])*100
     height = len(table)*100
     im = [[0 for j in range(width)] for i in range(height)]
