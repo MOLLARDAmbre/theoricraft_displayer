@@ -20,3 +20,10 @@ def get_color(value):
     g = (val * best_g + (5-val) * worst_g)/5
     b = (val * best_b + (5-val) * worst_b)/5
     return Gdk.RGBA(r, g, b, 0.8)
+
+def get_color_array(value):
+    val = value + 2 # the min goes from -2 to 0
+    r = (val * best_r + (5-val) * worst_r)/5
+    g = (val * best_g + (5-val) * worst_g)/5
+    b = (val * best_b + (5-val) * worst_b)/5
+    return [255*r, 255*g, 255*b]

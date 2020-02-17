@@ -1,9 +1,33 @@
-import gi
-from row_button import RowButton
-from option_button import OptionButton
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw
+import option_button
+import numpy as np
 
-def save():
-    saver = Gtk.FileChooser()
-    saver.set_action(GTK_FILE_CHOOSER_ACTION_SAVE)
+
+def save(path, table):
+    width = len(table[0])*100
+    height = len(table)*100
+    im = [[0 for j in range(width)] for i in range(height)]
+    for i in range(len(table[0])):
+        for j in range(len(table)):
+            for k in range(100):
+                for l in range(100):
+                    try :
+                        im[100*j+k][100*i+l] = table[j][i].get_color_array()
+                    except :
+                        im[100*j+k][100*i+l] = [255,255,255]
+
+    im = Image.fromarray(np.array(im, dtype=np.uint8))
+
+    draw = ImageDraw.Draw(im)
+
+    for i in range(len(table[0])):
+        for j in range(len(table)):
+            try :
+                draw.text((100*j,100*i+50), table[j][i].get_text(), (0,0,0))
+            except :
+                pass
+
+
+    im.save(path)

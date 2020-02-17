@@ -38,12 +38,13 @@ class MainWindow(Gtk.Window):
         self.situation_label = Gtk.Label("The current situation")
         self.situation_edit = Gtk.Entry()
         self.situation_edit.set_text("Situation")
+        self.image_generator = Gtk.Button("Save as image")
 
         ### Make the title
         self.offensive_char.connect("changed", self.updated_chars)
         self.defensive_char.connect("changed", self.updated_chars)
-        self.situation_edit.connect("key-press-event", self.updated_situation)
-
+        self.situation_edit.connect("key-release-event", self.updated_situation)
+        
 
         ### Fill the window with widgets
         self.grid.attach(self.offensive_char_label, 0, 0, 1, 1)
@@ -76,6 +77,8 @@ class MainWindow(Gtk.Window):
         self.current_focus = [0,0]
         self.center_grid.attach(self.table[0][0], 0,0,1,1)
         self.grid.attach(self.center_grid, 1, 6, 1, 1)
+        self.grid.attach(self.image_generator, 2, 7, 1, 1)
+        self.image_generator.connect("clicked", self.generate_image)
 
     def updated_chars(self, widget):
         try :
@@ -103,6 +106,9 @@ class MainWindow(Gtk.Window):
         if ev.keyval == Gdk.KEY_Return:
             self.add_defensive_option(widget)
 
+    def generate_image(self, widget):
+        from image_creator import save
+        save("test.jpg", self.table)
 
     def add_defensive_option(self, button):
         row_button = RowButton(self.add_defensive_option_edit.get_text(), self, "lig", len(self.table))
@@ -112,6 +118,7 @@ class MainWindow(Gtk.Window):
             self.table[-1].append(OptionButton())
             self.center_grid.attach(self.table[-1][i], i, len(self.table)-1, 1, 1)
         self.grid.show_all()
+        self.add_defensive_option_edit.set_text("")
         return
 
     def add_offensive_option(self, button):
@@ -122,6 +129,7 @@ class MainWindow(Gtk.Window):
             self.table[i].append(OptionButton())
             self.center_grid.attach(self.table[i][-1], len(self.table[0])-1, i, 1, 1)
         self.grid.show_all()
+        self.add_offensive_option_edit.set_text("")
         return
 
     def delete_row(self, orientation, index): #deletes a row or a column based on orientation

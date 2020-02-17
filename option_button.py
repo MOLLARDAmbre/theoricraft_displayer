@@ -9,8 +9,9 @@ class OptionButton(Gtk.Button):
     def __init__(self):
         super().__init__(self)
         super().set_label("Result unknown")
-        self.value = None # We don't have a value yet
+        self.value = 0
         self.connect("clicked", self.open_popup)
+        self.clicked = False
 
     def give_result(self, value, label):
         super().set_label(label) # Sets the new label
@@ -19,9 +20,15 @@ class OptionButton(Gtk.Button):
         super().override_background_color(0, col) #Update the background
 
     def open_popup(self, btn):
-        win = ResultPopup(self)
+        if (self.clicked):
+            win = ResultPopup(self, self.value, self.get_label())
+        else :
+            self.clicked = True
+            win = ResultPopup(self, self.value, "")
         win.show_all()
 
+    def get_color_array(self):
+        return Color.get_color_array(self.value)
 
-### TODO : make it change color based on what it needs
-### TODO : link with the popup
+    def get_text(self):
+        return self.get_label()

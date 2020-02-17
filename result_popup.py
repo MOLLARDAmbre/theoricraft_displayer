@@ -5,7 +5,7 @@ from gi.repository import Gdk
 
 
 class ResultPopup(Gtk.Window):
-    def __init__(self, btn):
+    def __init__(self, btn, val, lbl):
         super().__init__()
 
         # Grid setup
@@ -18,10 +18,11 @@ class ResultPopup(Gtk.Window):
         # Base elements
         self.btn = btn
         self.edit = Gtk.Entry()
+        self.edit.set_text(lbl)
         self.greeting = Gtk.Label("How good is the result for the offensive player ?")
         self.range_label = Gtk.Label("Please enter a number from -5 to 5")
         self.scale = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, -2, 2, 1)
-        self.scale.set_value(0)
+        self.scale.set_value(val)
         self.ask_comment = Gtk.Label("Do you have anything to add ?")
 
         # Buttons with behaviour
