@@ -4,6 +4,10 @@ from PIL import ImageDraw
 import option_button
 import numpy as np
 
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+
 
 class ImageGenerator():
     def __init__(self, table):
@@ -81,7 +85,7 @@ class ImageGenerator():
                 try :
                     text = self.table[j][i].get_text()
                     if (text != "Result unknown"):
-                        draw.text((i*self.hor_size + 10, j*self.vert_size + 10), self.table[j][i].get_text(), (0,0,0))
+                        draw.text((i*self.hor_size + 5, j*self.vert_size + 10), self.table[j][i].get_text(), (0,0,0))
                 except :
                     print((i*self.hor_size + 10, j*self.vert_size + 10))
         return im
@@ -89,34 +93,7 @@ class ImageGenerator():
 
 
 
-def save(path, table):
-    """
-    from os import chdir, getcwd
-    #chdir("~/theoricraft_displayer")
-    width = len(table[0])*100
-    height = len(table)*100
-    im = [[0 for j in range(width)] for i in range(height)]
-    for i in range(len(table[0])):
-        for j in range(len(table)):
-            for k in range(100):
-                for l in range(100):
-                    try :
-                        im[100*j+k][100*i+l] = table[j][i].get_color_array()
-                    except :
-                        im[100*j+k][100*i+l] = [255,255,255]
-
-    im = Image.fromarray(np.array(im, dtype=np.uint8))
-
-    draw = ImageDraw.Draw(im)
-
-    for i in range(len(table[0])):
-        for j in range(len(table)):
-            try :
-                draw.text((100*j,100*i+50), table[j][i].get_text(), (0,0,0))
-            except :
-                pass
-
-    """
+def generate_image(table):
     im = ImageGenerator(table)
     path = "test.jpg"
     im.calculate_sizes()
@@ -125,4 +102,20 @@ def save(path, table):
     image = im.add_grid(image)
     image = im.convert_into_PIL(image)
     image = im.add_labels(image)
-    image.save(path)
+    return image
+
+
+def save(path, table, parent):
+    dialog = Gtk.FileChooserDialog("Please choose a file", parent,
+        Gtk.FileChooserAction.SAVE,
+        (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+         Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+    dialog.set_current_name(path)
+
+    response = dialog.run()
+    if response == Gtk.ResponseType.OK:
+        generate_image(table).save(dialog.get_filename())
+    elif response == Gtk.ResponseType.CANCEL:
+        pass
+
+    dialog.destroy()

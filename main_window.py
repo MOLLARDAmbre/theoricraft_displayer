@@ -111,7 +111,7 @@ class MainWindow(Gtk.Window):
 
     def generate_image(self, widget):
         from image_creator import save
-        save("test.jpg", self.table)
+        save("test.jpg", self.table, self)
 
     def add_defensive_option(self, button):
         row_button = RowButton(self.add_defensive_option_edit.get_text(), self, "lig", len(self.table))
