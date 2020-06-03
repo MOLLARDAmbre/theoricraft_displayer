@@ -62,5 +62,3 @@ class RowPopup(Gtk.Window):
         if ev.keyval == Gdk.KEY_Escape: # When esc is pressed
             self.cancel(None) # No need to add the widget argument
             return
-
-### TODO : make it able to delete a row/column or edit the name

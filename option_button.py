@@ -3,7 +3,6 @@ import Color
 from result_popup import ResultPopup
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from gi.repository import Gdk
 
 class OptionButton(Gtk.Button):
     def __init__(self):
@@ -13,7 +12,7 @@ class OptionButton(Gtk.Button):
         self.connect("clicked", self.open_popup)
         self.clicked = False
 
-    def give_result(self, value, label):
+    def give_result(self, value, label): # used to change the value and/or the button text
         super().set_label(label) # Sets the new label
         self.value = value # Sets the new value
         col = Color.get_color(value) # Gets the new color
@@ -32,3 +31,6 @@ class OptionButton(Gtk.Button):
 
     def get_text(self):
         return self.get_label()
+
+    def to_save(self): # Called to save its data
+        return self.value

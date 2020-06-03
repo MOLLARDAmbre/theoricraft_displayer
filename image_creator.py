@@ -1,7 +1,6 @@
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw
-import option_button
 import numpy as np
 
 import gi
@@ -95,7 +94,6 @@ class ImageGenerator():
 
 def generate_image(table):
     im = ImageGenerator(table)
-    path = "test.jpg"
     im.calculate_sizes()
     image = im.generate_base()
     image = im.add_colors(image)

@@ -1,6 +1,7 @@
 import gi
 from row_button import RowButton
 from option_button import OptionButton
+import save_manager
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Gdk
@@ -12,76 +13,87 @@ class MainWindow(Gtk.Window):
         super().__init__()
         self.connect("destroy", Gtk.main_quit)
 
-        ### Grid setup
         self.grid = Gtk.Grid()
-        self.grid.set_column_spacing(10)
-        self.grid.set_row_spacing(15)
-        self.add(self.grid)
 
-        ### Title and upper options setup
         self.add_offensive_option_label = Gtk.Label("Add an offensive option")
         self.add_defensive_option_label = Gtk.Label("Add a defensive option")
         self.add_offensive_option_edit = Gtk.Entry()
         self.add_defensive_option_edit = Gtk.Entry()
         self.add_defensive_option_confirm = Gtk.Button(label="Confirm")
         self.add_offensive_option_confirm = Gtk.Button(label="Confirm")
-        self.add_defensive_option_confirm.connect("clicked", self.add_defensive_option)
-        self.add_offensive_option_confirm.connect("clicked", self.add_offensive_option)
         self.offensive_char_label = Gtk.Label("The offensive character")
         self.defensive_char_label = Gtk.Label("The defensive character")
         self.offensive_char = Gtk.ComboBoxText()
         self.defensive_char = Gtk.ComboBoxText()
-        fill_combo_box_with_char_names(self.offensive_char)
-        fill_combo_box_with_char_names(self.defensive_char)
         self.title_part_situation = Gtk.Label()
         self.title_part_characters = Gtk.Label()
         self.situation_label = Gtk.Label("The current situation")
         self.situation_edit = Gtk.Entry()
-        self.situation_edit.set_text("Situation")
-        self.image_generator = Gtk.Button("Save as image")
+        self.image_generator = Gtk.Button("Export as image")
+        self.save_button = Gtk.Button("Save")
+        self.load_button = Gtk.Button("Load")
+        self.center_grid = Gtk.Grid()
 
-        ### Make the title
+        self.table = [[Gtk.Label(self.situation_edit.get_text())]]
+
+        self.instanciate_ui()
+        self.connect_elements()
+        self.attach_to_grid()
+
+
+
+
+    def instanciate_ui(self): # All setups that doesn't require to be in the constructor goes here
+        self.grid.set_column_spacing(10)
+        self.grid.set_row_spacing(15)
+        self.add(self.grid)
+        fill_combo_box_with_char_names(self.offensive_char)
+        fill_combo_box_with_char_names(self.defensive_char)
+        self.situation_edit.set_text("Situation")
+        self.center_grid.set_column_homogeneous(True)
+        self.center_grid.set_column_spacing(5)
+        self.center_grid.set_row_homogeneous(True)
+        self.center_grid.set_row_spacing(5)
+        self.current_focus = [0,0]
+
+
+    def connect_elements(self):
+        self.add_defensive_option_confirm.connect("clicked", self.add_defensive_option)
+        self.add_offensive_option_confirm.connect("clicked", self.add_offensive_option)
+        self.image_generator.connect("clicked", self.generate_image)
+        self.save_button.connect("clicked", self.save)
+        self.load_button.connect("clicked", self.load)
+        self.add_offensive_option_edit.connect("key-press-event", self.confirm_add_offensive_option)
+        self.add_defensive_option_edit.connect("key-press-event", self.confirm_add_defensive_option)
         self.offensive_char.connect("changed", self.updated_chars)
         self.defensive_char.connect("changed", self.updated_chars)
         self.situation_edit.connect("key-release-event", self.updated_situation)
         self.situation_edit.connect("key-press-event", self.move_situation)
 
 
-        ### Fill the window with widgets
+    def attach_to_grid(self):
         self.grid.attach(self.offensive_char_label, 0, 0, 1, 1)
         self.grid.attach(self.offensive_char, 0, 1, 1, 1)
         self.grid.attach(self.add_offensive_option_label, 0, 3, 1, 1)
         self.grid.attach(self.add_offensive_option_edit, 0, 4, 1, 1)
         self.grid.attach(self.add_offensive_option_confirm, 0, 5, 1, 1)
-        self.add_offensive_option_edit.connect("key-press-event", self.confirm_add_offensive_option)
-
         self.grid.attach(self.defensive_char_label, 2, 0, 1, 1)
         self.grid.attach(self.defensive_char, 2, 1, 1, 1)
         self.grid.attach(self.add_defensive_option_label, 2, 3, 1, 1)
         self.grid.attach(self.add_defensive_option_edit, 2, 4, 1, 1)
         self.grid.attach(self.add_defensive_option_confirm, 2, 5, 1, 1)
-        self.add_defensive_option_edit.connect("key-press-event", self.confirm_add_defensive_option)
-
-
         self.grid.attach(self.situation_label, 1, 0, 1, 1)
         self.grid.attach(self.situation_edit, 1, 1, 1, 1)
         self.grid.attach(self.title_part_characters, 1, 4, 1, 1)
         self.grid.attach(self.title_part_situation, 1, 5, 1, 1)
-
-        ### Main frame setup
-        self.center_grid = Gtk.Grid()
-        self.center_grid.set_column_homogeneous(True)
-        self.center_grid.set_column_spacing(5)
-        self.center_grid.set_row_homogeneous(True)
-        self.center_grid.set_row_spacing(5)
-        self.table = [[Gtk.Label(self.situation_edit.get_text())]]
-        self.current_focus = [0,0]
         self.center_grid.attach(self.table[0][0], 0,0,1,1)
         self.grid.attach(self.center_grid, 1, 6, 1, 1)
         self.grid.attach(self.image_generator, 2, 7, 1, 1)
-        self.image_generator.connect("clicked", self.generate_image)
+        self.grid.attach(self.save_button, 0, 7, 1, 1)
+        self.grid.attach(self.load_button, 1, 7, 1, 1)
 
-    def updated_chars(self, widget):
+
+    def updated_chars(self, widget): # Catches the character names and put it in the title
         try :
             o = self.offensive_char.get_active_text() # offensive char text
             d = self.defensive_char.get_active_text() # defensive char text
@@ -90,7 +102,7 @@ class MainWindow(Gtk.Window):
         except :
             pass
 
-    def move_situation(self, widget, ev):
+    def move_situation(self, widget, ev): # Catches movement
         if ev.keyval == Gdk.KEY_Left:
             self.offensive_char.grab_focus()
         if ev.keyval == Gdk.KEY_Right:
@@ -101,17 +113,17 @@ class MainWindow(Gtk.Window):
         self.title_part_situation.set_text(self.situation_edit.get_text())
         self.table[0][0].set_text(self.situation_edit.get_text())
 
-    def confirm_add_offensive_option(self, widget, ev):
+    def confirm_add_offensive_option(self, widget, ev): # Catches entry to validate the input (shortcut)
         if ev.keyval == Gdk.KEY_Return:
             self.add_offensive_option(widget)
 
-    def confirm_add_defensive_option(self, widget, ev):
+    def confirm_add_defensive_option(self, widget, ev): # idem
         if ev.keyval == Gdk.KEY_Return:
             self.add_defensive_option(widget)
 
     def generate_image(self, widget):
         from image_creator import save
-        save("test.jpg", self.table, self)
+        save(self.default_path(), self.table, self)
 
     def add_defensive_option(self, button):
         row_button = RowButton(self.add_defensive_option_edit.get_text(), self, "lig", len(self.table))
@@ -124,6 +136,15 @@ class MainWindow(Gtk.Window):
         self.add_defensive_option_edit.set_text("")
         return
 
+    def add_defensive_option_auto(self, name): # Used to programatically add an entry
+        row_button = RowButton(name, self, "lig", len(self.table))
+        self.table.append([row_button])
+        self.center_grid.attach(row_button, 0, len(self.table)-1, 1, 1)
+        for i in range(1, len(self.table[0])):
+            self.table[-1].append(OptionButton())
+            self.center_grid.attach(self.table[-1][i], i, len(self.table)-1, 1, 1)
+        return
+
     def add_offensive_option(self, button):
         row_button = RowButton(self.add_offensive_option_edit.get_text(), self, "col", len(self.table[0]))
         self.table[0].append(row_button)
@@ -133,6 +154,15 @@ class MainWindow(Gtk.Window):
             self.center_grid.attach(self.table[i][-1], len(self.table[0])-1, i, 1, 1)
         self.grid.show_all()
         self.add_offensive_option_edit.set_text("")
+        return
+
+    def add_offensive_option_auto(self, name): # Used to programatically add an entry
+        row_button = RowButton(name, self, "col", len(self.table[0]))
+        self.table[0].append(row_button)
+        self.center_grid.attach(row_button, len(self.table[0])-1, 0, 1, 1)
+        for i in range(1, len(self.table)):
+            self.table[i].append(OptionButton())
+            self.center_grid.attach(self.table[i][-1], len(self.table[0])-1, i, 1, 1)
         return
 
     def delete_row(self, orientation, index): #deletes a row or a column based on orientation
@@ -172,6 +202,19 @@ class MainWindow(Gtk.Window):
         self.table = new_table
         self.center_grid.remove_column(index)
 
+    def save(self, widget): # Saves the current table to file
+        save_manager.save(self, self.table, self.default_path())
+        return
+
+    def load(self, widget): # Loads the current table to file
+        save_manager.load(self)
+        return
+
+    def default_path(self):
+        if (len(self.title_part_characters.get_text()) > 1):
+            return self.title_part_situation.get_text() + " - " + self.title_part_characters.get_text();
+        else :
+            return self.title_part_situation.get_text()
 
 
 def fill_combo_box_with_char_names(cb):

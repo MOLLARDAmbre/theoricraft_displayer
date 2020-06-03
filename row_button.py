@@ -29,4 +29,5 @@ class RowButton(Gtk.Button):
     def desincr_index(self):
         self.index = self.index - 1
 
-### TODO : link with the popup
+    def to_save(self): # Called to save its data
+        return self.get_text()

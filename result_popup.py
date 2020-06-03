@@ -21,7 +21,7 @@ class ResultPopup(Gtk.Window):
         self.edit.set_text(lbl)
         self.greeting = Gtk.Label("How good is the result for the offensive player ?")
         self.range_label = Gtk.Label("Please enter a number from -5 to 5")
-        self.scale = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, -2, 2, 1)
+        self.scale = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, -2, 2, .5)
         self.scale.set_value(val)
         self.ask_comment = Gtk.Label("Do you have anything to add ?")
 
